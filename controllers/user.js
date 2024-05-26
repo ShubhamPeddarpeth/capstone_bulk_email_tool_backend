@@ -51,15 +51,13 @@ const sendMails = async (req, res) => {
   const toEmail = group.emails;
   const subject = req.body.subject;
   const template = temp !== "none" ? temp.content : " ";
-  const apiKey = req.user.apiKey;
-  sendMail(fromEmail, toEmail, subject, message, apiKey);
+  sendMail(fromEmail, toEmail, subject, message);
   const sendBox = new Sent({
     userId: req.user._id,
     subject: req.body.subject,
     groupId: req.body.group,
     message: req.body.template !== "none" ? temp.name : "Custom message",
     fromEmail: req.user.email,
-    apiKey: req.user.apiKey,
   });
 
   const result = await sendBox.save();
@@ -82,12 +80,18 @@ const deleteGroup = async (req, res) => {
 };
 
 const register = async (req, res) => {
+  // Check if user already exists
+  const existingUser = await User.findOne({ email: req.body.email });
+  if (existingUser) {
+    return res
+      .status(409)
+      .send({ success: false, message: "User already exists. Please login." });
+  }
   const user = new User({
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     email: req.body.email,
     password: req.body.password,
-    apiKey: req.body.apiKey,
   });
   if (!user)
     return res

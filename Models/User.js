@@ -19,10 +19,6 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    apiKey: {
-      type: String,
-      required: true,
-    },
   },
   { timestamps: true }
 );
